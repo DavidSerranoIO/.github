@@ -1,0 +1,33 @@
+name: Enhancement
+description: An increment or task that needs to be performed.
+type: Enhancement
+projects: [ "DavidSerranoIO/1" ]
+assignees:
+  - svprdga
+
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      placeholder: Describe clearly what the enhancement aims to achieve.
+    validations:
+      required: true
+
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Requirements
+      description: List the requirements.
+      value: |
+        - [ ] Requirement 1
+    validations:
+      required: false
+
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Subtasks
+      description: Add as many subtasks as needed.
+      value: |
+        - [ ] Subtask 1

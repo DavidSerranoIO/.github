@@ -1,0 +1,27 @@
+name: Release
+description: Track the tasks required to complete and publish a new release.
+type: Release
+projects: [ "DavidSerranoIO/1" ]
+assignees:
+  - svprdga
+
+body:
+  - type: textarea
+    id: release_tasks
+    attributes:
+      label: Release task list
+      description: Complete the checklist before publishing the release.
+      value: |
+        - [ ] Test version
+        - [ ] Close CommonLib version if required
+        - [ ] Prepare version
+        - [ ] Internal test if required
+        - [ ] Deploy in Google Play
+        - [ ] Deploy in Apple App Store
+        - [ ] Deploy in Samsung Galaxy Store
+        - [ ] Deploy in Huawei App Gallery
+        - [ ] Deploy in private cloud
+        - [ ] Upload debug symbols
+        - [ ] Clean resources
+    validations:
+      required: true

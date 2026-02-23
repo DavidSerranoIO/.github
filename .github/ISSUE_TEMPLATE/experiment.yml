@@ -1,0 +1,28 @@
+name: Experiment
+description: Track an experiment to test a hypothesis or evaluate an idea.
+type: Experiment
+projects: [ "DavidSerranoIO/2" ]
+assignees:
+  - svprdga
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Experiment description
+      placeholder: |
+        Explain clearly:
+        - The hypothesis
+        - What will be tested
+        - How it will be measured
+        - Any relevant considerations
+    validations:
+      required: true
+
+  - type: textarea
+    id: subtasks
+    attributes:
+      label: Subtasks
+      description: Add as many subtasks as needed.
+      value: |
+        - [ ] Subtask 1
