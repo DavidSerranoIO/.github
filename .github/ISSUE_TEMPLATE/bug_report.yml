@@ -1,6 +1,7 @@
 name: Bug report
 description: Report a detected problem.
 type: Bug
+projects: [ "DavidSerranoIO/1" ]
 assignees:
   - svprdga
 
