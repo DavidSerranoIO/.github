@@ -1,6 +1,5 @@
-name: Bug report 2
+name: Bug report
 description: Report a detected problem.
-title: "[Bug] "
 type: Bug
 assignees:
   - svprdga
@@ -41,9 +40,10 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
+  - type: textarea
     id: subtasks
     attributes:
       label: Subtasks
-      options:
-        - label: Subtask 1
+      value: |
+	- [ ] Subtask 1
+
