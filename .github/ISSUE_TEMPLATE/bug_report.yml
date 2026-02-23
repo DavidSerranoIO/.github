@@ -17,10 +17,8 @@ body:
     id: steps
     attributes:
       label: Steps to reproduce
-      placeholder: |
+      value: |
         1.
-        2.
-        3.
     validations:
       required: true
 
