@@ -20,7 +20,9 @@ body:
       label: Requirements
       description: List the requirements.
       value: |
-        - [ ] Requirement 1
+        - [ ] The implemented solution meets the intended objective.
+        - [ ] Analytics events have been added where appropriate.
+        - [ ] Error logging has been added where appropriate.
     validations:
       required: false
 

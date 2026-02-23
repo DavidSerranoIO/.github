@@ -44,5 +44,6 @@ body:
     attributes:
       label: Subtasks
       value: |
-        - [ ] Subtask 1
-
+        - [ ] Fix the reported issue
+        - [ ] Add tests to prevent regressions
+        - [ ] Improve error logging if needed
