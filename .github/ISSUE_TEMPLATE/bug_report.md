@@ -1,6 +1,7 @@
 ---
 name: "Bug report"
 about: "Report a detected problem."
+types: "bug"
 assignees: "svprdga"
 ---
 
