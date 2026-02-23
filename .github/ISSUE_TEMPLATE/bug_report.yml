@@ -40,10 +40,3 @@ body:
     validations:
       required: true
 
-  - type: textarea
-    id: subtasks
-    attributes:
-      label: Subtasks
-      value: |
-	- [ ] Subtask 1
-
