@@ -1,7 +1,7 @@
 name: Experiment
 description: Track an experiment to test a hypothesis or evaluate an idea.
 type: Experiment
-projects: [ "DavidSerranoIO/2" ]
+projects: [ "DavidSerranoIO/1" ]
 assignees:
   - svprdga
 
