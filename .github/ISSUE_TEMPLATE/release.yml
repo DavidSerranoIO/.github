@@ -12,6 +12,7 @@ body:
       label: Release task list
       description: Complete the checklist before publishing the release.
       value: |
+	- [ ] Create release notes if required
         - [ ] Test version
         - [ ] Close CommonLib version if required
         - [ ] Prepare version
@@ -20,8 +21,8 @@ body:
         - [ ] Deploy in Apple App Store
         - [ ] Deploy in Samsung Galaxy Store
         - [ ] Deploy in Huawei App Gallery
-        - [ ] Deploy in private cloud
         - [ ] Upload debug symbols
+	- [ ] Answer user reviews in stores
         - [ ] Clean resources
     validations:
       required: true
