@@ -1,7 +1,7 @@
 name: Release
 description: Track the tasks required to complete and publish a new release.
 type: Release
-projects: [ "DavidSerranoIO/1" ]
+projects: [ "DavidSerranoIO/4" ]
 assignees:
   - svprdga
 
