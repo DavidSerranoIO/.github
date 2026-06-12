@@ -1,6 +1,7 @@
 name: Release
 description: Track the tasks required to complete and publish a new release.
 type: Release
+projects: [ "DavidSerranoIO/4" ]
 assignees:
   - svprdga
 
@@ -11,7 +12,7 @@ body:
       label: Release task list
       description: Complete the checklist before publishing the release.
       value: |
-	- [ ] Create release notes if required
+        - [ ] Create release notes if required
         - [ ] Test version
         - [ ] Close CommonLib version if required
         - [ ] Prepare version
@@ -21,7 +22,7 @@ body:
         - [ ] Deploy in Samsung Galaxy Store
         - [ ] Deploy in Huawei App Gallery
         - [ ] Upload debug symbols
-	- [ ] Answer user reviews in stores
+        - [ ] Respond to user reviews in app stores
         - [ ] Clean resources
     validations:
       required: true
