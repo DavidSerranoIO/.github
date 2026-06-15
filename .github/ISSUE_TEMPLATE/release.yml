@@ -16,7 +16,7 @@ body:
         - [ ] Test version
         - [ ] Close CommonLib version if required
         - [ ] Prepare version
-	- [ ] Create listings and upload release notes
+        - [ ] Create listings and upload release notes
         - [ ] Internal test if required
         - [ ] Deploy in Google Play
         - [ ] Deploy in Apple App Store
