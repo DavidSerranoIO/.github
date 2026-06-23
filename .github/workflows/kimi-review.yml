@@ -1,0 +1,122 @@
+name: Kimi PR Review
+
+on:
+  workflow_call:
+    secrets:
+      MOONSHOT_API_KEY:
+        required: true
+      CROSS_REPO_TOKEN:
+        required: true
+
+env:
+  KIMI_MODEL: kimi-k2.7-code
+  PROJECTS_REPO: DavidSerranoIO/projects
+  PROMPTS_REPO: DavidSerranoIO/prompts
+  PROMPTS_PATH: pr_review/flutter
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  kimi-review:
+    if: ${{ !startsWith(github.event.pull_request.head.ref, 'release/') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          path: repo
+
+      - name: Checkout review prompt
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PROMPTS_REPO }}
+          token: ${{ secrets.CROSS_REPO_TOKEN }}
+          sparse-checkout: |
+            ${{ env.PROMPTS_PATH }}
+          sparse-checkout-cone-mode: false
+          path: prompts
+
+      - name: Build diff
+        working-directory: repo
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          git diff "$BASE_SHA"...HEAD > /tmp/diff.txt
+          head -c 100000 /tmp/diff.txt > /tmp/diff.trimmed.txt
+
+      - name: Fetch linked task
+        env:
+          GH_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: |
+          if [[ "$HEAD_REF" =~ ^[^/]+/([0-9]+) ]]; then
+            ISSUE_NUMBER="${BASH_REMATCH[1]}"
+          else
+            ISSUE_NUMBER=""
+          fi
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "No task number found in branch '$HEAD_REF', skipping."
+            echo "No linked task description available." > /tmp/task.txt
+          else
+            echo "Found task #$ISSUE_NUMBER in branch '$HEAD_REF', fetching from $PROJECTS_REPO"
+            if gh issue view "$ISSUE_NUMBER" --repo "$PROJECTS_REPO" --json title,body \
+                --jq '"Title: " + .title + "\n\n" + (.body // "")' > /tmp/task.txt; then
+              echo "Task #$ISSUE_NUMBER fetched successfully."
+            else
+              echo "Could not fetch task #$ISSUE_NUMBER, skipping."
+              echo "No linked task description available." > /tmp/task.txt
+            fi
+          fi
+
+      - name: Run Kimi review
+        env:
+          MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+        run: |
+          jq -n \
+            --rawfile sys "prompts/${PROMPTS_PATH}/ai_review_prompt.txt" \
+            --rawfile conventions "prompts/${PROMPTS_PATH}/flutter_context.txt" \
+            --rawfile task /tmp/task.txt \
+            --rawfile diff /tmp/diff.trimmed.txt \
+            --arg model "$KIMI_MODEL" \
+            '{
+              model: $model,
+              temperature: 1,
+              messages: [
+                {role: "system", content: ($sys + "\n\n──────────────────────────────────\n\n" + $conventions)},
+                {role: "user", content: ("Task description:\n\n" + $task + "\n\n──────────────────────────────────\n\nDiff:\n\n" + $diff)}
+              ]
+            }' > /tmp/payload.json
+
+          HTTP_CODE=$(curl -s --max-time 180 -o /tmp/response.json -w '%{http_code}' \
+            https://api.moonshot.ai/v1/chat/completions \
+            -H "Authorization: Bearer $MOONSHOT_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/payload.json)
+
+          echo "Moonshot API HTTP status: $HTTP_CODE"
+          echo "Moonshot API raw response:"
+          cat /tmp/response.json
+
+          if ! jq -e -r '.choices[0].message.content' /tmp/response.json > /tmp/review.md; then
+            {
+              echo "Kimi review failed (HTTP $HTTP_CODE). Raw API response:"
+              echo
+              echo '```json'
+              cat /tmp/response.json
+              echo '```'
+            } > /tmp/review.md
+          fi
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --repo "${{ github.repository }}" \
+            --body-file /tmp/review.md
