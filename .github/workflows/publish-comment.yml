@@ -1,0 +1,56 @@
+name: Publish Commit Comment
+
+on:
+  workflow_call:
+    inputs:
+      commit_message:
+        required: true
+        type: string
+      branch_ref:
+        required: true
+        type: string
+    secrets:
+      CROSS_REPO_TOKEN:
+        required: true
+
+env:
+  PROJECTS_REPO: DavidSerranoIO/projects
+
+jobs:
+  publish-comment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check commit message length
+        env:
+          COMMIT_MESSAGE: ${{ inputs.commit_message }}
+        run: |
+          LENGTH=${#COMMIT_MESSAGE}
+          echo "Commit message length: $LENGTH"
+          if [ "$LENGTH" -lt 10 ]; then
+            echo "Commit message too short (< 10 chars), skipping."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Extract issue number from branch
+        if: env.SKIP != 'true'
+        env:
+          BRANCH_REF: ${{ inputs.branch_ref }}
+        run: |
+          if [[ "$BRANCH_REF" =~ ^[^/]+/([0-9]+) ]]; then
+            echo "ISSUE_NUMBER=${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
+          else
+            echo "No issue number found in branch '$BRANCH_REF', skipping."
+            echo "SKIP=true" >> "$GITHUB_ENV"
+          fi
+
+      - name: Post comment to issue
+        if: env.SKIP != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+          COMMIT_MESSAGE: ${{ inputs.commit_message }}
+        run: |
+          echo "$COMMIT_MESSAGE" > /tmp/comment.txt
+          gh issue comment "$ISSUE_NUMBER" \
+            --repo "${{ env.PROJECTS_REPO }}" \
+            --body-file /tmp/comment.txt
