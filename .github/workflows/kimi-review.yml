@@ -22,7 +22,7 @@ jobs:
   kimi-review:
     if: ${{ !startsWith(github.event.pull_request.head.ref, 'release/') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 20
     steps:
       - name: Checkout PR head
         uses: actions/checkout@v5
@@ -93,7 +93,7 @@ jobs:
               ]
             }' > /tmp/payload.json
 
-          HTTP_CODE=$(curl -s --max-time 400 -o /tmp/response.json -w '%{http_code}' \
+          HTTP_CODE=$(curl -s --max-time 900 -o /tmp/response.json -w '%{http_code}' \
             https://api.moonshot.ai/v1/chat/completions \
             -H "Authorization: Bearer $MOONSHOT_API_KEY" \
             -H "Content-Type: application/json" \
